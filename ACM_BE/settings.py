@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'All_models',
     'Authentication',
+    'Notification',
 ]
 
 MIDDLEWARE = [
