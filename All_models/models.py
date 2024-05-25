@@ -1,47 +1,42 @@
+import uuid
 from django.db import models
 
 
 class Employee(models.Model):
-
     class Meta:
         db_table = 'Employee'
 
-    id = models.CharField(primary_key=True, max_length=100)
-    image = models.ImageField(upload_to='employee_images/')
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    image = models.ImageField(upload_to='employee_images/', null=True)
     name = models.CharField(max_length=255)
     citizen_id = models.CharField(max_length=100)
     birthdate = models.DateTimeField()
-    position = models.CharField(max_length=255)
     appointment_date = models.DateTimeField()
 
 
 class User(models.Model):
-
     class Meta:
-        db_table = 'User'
+        db_table = 'Users'
 
-    id = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    role = models.CharField(max_length=100)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='user')
+    role = models.ForeignKey('Role', on_delete=models.CASCADE, db_column='role_id')
 
 
 class Room(models.Model):
-
     class Meta:
         db_table = 'Room'
 
-    id = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=255)
 
 
 class BookingRoom(models.Model):
-
     class Meta:
         db_table = 'BookingRoom'
 
-    id = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     timeslot = models.IntegerField()
@@ -49,24 +44,69 @@ class BookingRoom(models.Model):
     date = models.DateTimeField()
 
 
-class Notification(models.Model):
+class NotificationType(models.Model):
+    class Meta:
+        db_table = 'NotificationType'
 
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    name = models.CharField(max_length=100, default=None, null=True)
+
+
+class Notification(models.Model):
     class Meta:
         db_table = 'Notification'
 
-    id = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    title = models.CharField(max_length=255, null=True)
     content = models.TextField()
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
 
-class EmployeeNotification(models.Model):
+class EmployeeTypeNotification(models.Model):
+    class Meta:
+        db_table = 'EmployeeTypeNotification'
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, db_column='employee_id')
+    type = models.ForeignKey('NotificationType', on_delete=models.CASCADE, db_column='type_id')
+    notification = models.ForeignKey('Notification', on_delete=models.CASCADE, db_column='notification_id')
+    created_at = models.DateTimeField(auto_now=True)
 
+
+class EmployeeNotification(models.Model):
     class Meta:
         db_table = 'EmployeeNotification'
         unique_together = ('employee', 'notification')
 
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     notification = models.ForeignKey(Notification, on_delete=models.CASCADE)
+    create_at = models.DateTimeField(null=True)
 
 
+class Position(models.Model):
+    class Meta:
+        db_table = 'Position'
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    position = models.CharField(max_length=255)
+
+
+class Role(models.Model):
+    class Meta:
+        db_table = 'Role'
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    role = models.CharField(max_length=255)
+
+
+class EmployeeRolePosition(models.Model):
+    class Meta:
+        db_table = 'EmployeeRolePosition'
+        unique_together = ('position', 'role', 'employee')
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    position = models.ForeignKey(Position, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    assigned_at = models.DateTimeField()
