@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -21,7 +21,7 @@ class GetNotificationViews(APIView):
                 "type": item.type.name
             }
             response_data.append(temp)
-        return Response(response_data, status=200)
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class GetNotificationType(generics.ListAPIView):
@@ -36,13 +36,8 @@ class CreateNotification(APIView):
         type_name = data.get('type')
         notification_data = data.get('notification')
 
-        # Validate Employee
-        try:
-            employee = Employee.objects.get(id=employee_id)
-        except Employee.DoesNotExist:
-            return Response({'error': 'Invalid employee_id'}, status=status.HTTP_400_BAD_REQUEST)
+        employee = get_object_or_404(Employee, id=employee_id)
 
-        # Get or create NotificationType
         notification_type, created = NotificationType.objects.get_or_create(name=type_name)
 
         notification_data['created_at'] = timezone.now()
@@ -69,33 +64,21 @@ class UpdateNotification(APIView):
         type_name = data.get('type')
         notification_data = data.get('notification')
 
-        # Validate Employee
-        try:
-            employee = Employee.objects.get(id=employee_id)
-        except Employee.DoesNotExist:
-            return Response({'error': 'Invalid employee_id'}, status=status.HTTP_400_BAD_REQUEST)
+        employee = get_object_or_404(Employee, id=employee_id)
 
-        # Get the existing notification
-        try:
-            employee_notification = EmployeeTypeNotification.objects.get(id=id)
-        except EmployeeTypeNotification.DoesNotExist:
-            return Response({'error': 'Notification does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        employee_notification = get_object_or_404(EmployeeTypeNotification, id=id)
 
-        # Update notification type if needed
         notification_type, created = NotificationType.objects.get_or_create(name=type_name)
 
-        # Update notification data
         notification_instance = employee_notification.notification
         for key, value in notification_data.items():
             setattr(notification_instance, key, value)
         notification_instance.save()
 
-        # Update EmployeeTypeNotification data
         employee_notification.employee = employee
         employee_notification.type = notification_type
         employee_notification.save()
 
-        # Serialize the updated data
         serializer = EmployeeTypeNotificationSerializer(employee_notification)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
