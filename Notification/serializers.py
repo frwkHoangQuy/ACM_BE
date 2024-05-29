@@ -33,4 +33,3 @@ class EmployeeTypeNotificationSerializer(serializers.ModelSerializer):
         notification = Notification.objects.create(**notification_data)
         employee_type_notification = EmployeeTypeNotification.objects.create(notification=notification, **validated_data)
         return employee_type_notification
-
