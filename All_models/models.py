@@ -22,6 +22,7 @@ class User(models.Model):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     role = models.ForeignKey('Role', on_delete=models.CASCADE, db_column='role_id')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
 
 class Room(models.Model):
