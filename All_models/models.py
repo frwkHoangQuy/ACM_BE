@@ -11,6 +11,7 @@ class Employee(models.Model):
     name = models.CharField(max_length=255)
     citizen_id = models.CharField(max_length=100)
     birthdate = models.DateTimeField()
+    phone = models.CharField(max_length=20)
     appointment_date = models.DateTimeField()
 
 
@@ -33,6 +34,13 @@ class Room(models.Model):
     name = models.CharField(max_length=255)
 
 
+class TimeSlot(models.Model):
+    class Meta:
+        db_table = 'TimeSlot'
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    name = models.CharField(max_length=100)
+
+
 class BookingRoom(models.Model):
     class Meta:
         db_table = 'BookingRoom'
@@ -40,9 +48,8 @@ class BookingRoom(models.Model):
     id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    timeslot = models.IntegerField()
-    phone = models.CharField(max_length=20)
-    date = models.DateTimeField()
+    timeslot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+    date = models.CharField(max_length=100)
 
 
 class NotificationType(models.Model):
@@ -67,6 +74,7 @@ class Notification(models.Model):
 class EmployeeTypeNotification(models.Model):
     class Meta:
         db_table = 'EmployeeTypeNotification'
+
     id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     employee = models.ForeignKey('Employee', on_delete=models.CASCADE, db_column='employee_id')
     type = models.ForeignKey('NotificationType', on_delete=models.CASCADE, db_column='type_id')

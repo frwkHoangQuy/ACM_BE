@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'All_models',
     'Authentication',
     'Notification',
+    'Meeting',
     "corsheaders",
 ]
 
