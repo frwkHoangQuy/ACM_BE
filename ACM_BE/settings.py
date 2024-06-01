@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'Notification',
     'Meeting',
     "corsheaders",
+    'Form',
 ]
 
 MIDDLEWARE = [
