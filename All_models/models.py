@@ -119,3 +119,24 @@ class EmployeeRolePosition(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     assigned_at = models.DateTimeField()
+
+
+class FormType(models.Model):
+    class Meta:
+        db_table = 'FormType'
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    name = models.CharField(max_length=100)
+
+
+class Form(models.Model):
+    class Meta:
+        db_table = 'Form'
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    type = models.ForeignKey(FormType, on_delete=models.CASCADE)
+    title = models.CharField(max_length=1000)
+    content = models.TextField(max_length=100000000)
+    status = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)

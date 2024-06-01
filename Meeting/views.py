@@ -1,9 +1,9 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from All_models.models import Room, BookingRoom, TimeSlot, Employee
+from All_models.models import Room, BookingRoom, TimeSlot, Employee, Form
 from .serializer import RoomSerializer, CustomBookingRoomSerializer, CreateBookingRoomSerializer
 
 
@@ -58,3 +58,6 @@ class DeleteBookingRoom(APIView):
         instance = get_object_or_404(BookingRoom, id=id)
         instance.delete()
         return Response("Deleted !!", status=status.HTTP_200_OK)
+
+
+
